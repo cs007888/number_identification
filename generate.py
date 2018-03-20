@@ -1,6 +1,7 @@
 import random
 import os
 import numpy as np
+import cv2
 from PIL import Image, ImageDraw, ImageFont
 
 NUM = [chr(i) for i in range(0x30, 0x39)]
@@ -53,7 +54,7 @@ def get_index():
 
 def write_label(filename, label):
     label_file = open('label.txt', 'w')
-    label_file.write
+    label_file.write()
 
 # def get_verify_pic():
 #     if not os.path.isdir(PIC_PATH):
@@ -70,5 +71,6 @@ def write_label(filename, label):
 #     label_file.close()
 
 
-# if __name__ == '__main__':
-#     get_verify_pic()
+if __name__ == '__main__':
+    img, label = draw((120, 40))
+    img.save(label+'.png')
