@@ -7,11 +7,9 @@ from keras.optimizers import SGD
 from keras import backend as K
 from keras.callbacks import ModelCheckpoint
 from keras import metrics
+from constant import CHAR_INDEX_DICT, NUM_CHAR
 
-CHARS = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
-'V', 'W', 'X', 'Y', 'Z', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-CHAR_DICT = {c:i for i, c in enumerate(CHARS)}
-NUM_CHAR = len(CHARS)
+
 
 def build_model():
     inputs = Input((40, None, 1), name='inputs')
@@ -80,7 +78,8 @@ def ctc_lambda_func(args):
     y_pred = y_pred[:, 0, :, :]
     return K.ctc_batch_cost(labels, y_pred, input_length, label_length)
 
-if __name__ == '__main__':
+
+def train():
     inputs, y_pred = build_model()
     labels = Input([6], dtype='float32', name='labels')
     input_len = Input([1], dtype='int64', name='input_length')
@@ -91,7 +90,7 @@ if __name__ == '__main__':
     model.compile(loss={'ctc':lambda y_true, y_pred: y_pred}, optimizer=sgd)
     train = ImageGenerator((120, 40), 12800, 128)
     test = ImageGenerator((120, 40), 1280, 128)
-    cb = ModelCheckpoint('model/result.hdf5', save_best_only=True)
+    cb = ModelCheckpoint('model/result.h5', save_best_only=True)
     model.fit_generator(
         generator=train.get_data(),
         steps_per_epoch=int(train.num_examples / train.batch_size),
@@ -100,4 +99,8 @@ if __name__ == '__main__':
         validation_steps=int(test.num_examples / test.batch_size),
         callbacks=[cb]
     )
+
+
+if __name__ == '__main__':
+    train()
 
