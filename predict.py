@@ -1,5 +1,4 @@
-from keras.models import Model
-from keras import backend as K
+from tensorflow import keras
 from constant import INDEX_CHAR_DICT
 import train
 import cv2
@@ -21,7 +20,7 @@ def fastdecode(pred):
 
 def predict(img):
     inputs, pred = train.build_model()
-    model = Model(inputs, pred)
+    model = keras.Model(inputs, pred)
     model.load_weights('model/result.h5')
     y = model.predict(img)
 
