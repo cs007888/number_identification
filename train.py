@@ -50,7 +50,7 @@ class ImageGenerator:
         labels = np.zeros((self.batch_size, self.max_len))
         images = np.zeros((self.batch_size, self.img_h, self.img_w, 1))
         for i in range(self.batch_size):
-            image, text = generate.draw((self.img_w, self.img_h))
+            image, text = generation.draw((self.img_w, self.img_h))
             label = encode(self.max_len, text)
             labels[i] = label
             image = np.asarray(image)
@@ -87,19 +87,22 @@ def train():
     labels = keras.Input([6], dtype='float32', name='labels')
     input_len = keras.Input([1], dtype='int64', name='input_length')
     label_len = keras.Input([1], dtype='int64', name='label_length')
+    # refer official example
     ctc_loss = keras.layers.Lambda(ctc_lambda_func, (1,), name='ctc')([y_pred, labels, input_len, label_len])
+
     #sgd = keras.optimizers.SGD(lr=0.01, decay=1e-6, momentum=0.9, nesterov=True, clipnorm=5)
     model = keras.Model(inputs=[inputs, labels, input_len, label_len], outputs=[ctc_loss])
     model.compile(loss={'ctc':lambda y_true, y_pred: y_pred}, optimizer='adam')
-    train = ImageGenerator((120, 40), 12800, 128)
-    test = ImageGenerator((120, 40), 1280, 128)
+    
+    train_gen = ImageGenerator((120, 40), 12800, 128)
+    test_gen = ImageGenerator((120, 40), 1280, 128)
     cb = keras.callbacks.ModelCheckpoint('./model/result.h5')
     model.fit_generator(
-        generator=train.get_data(),
-        steps_per_epoch=int(train.num_examples / train.batch_size),
+        generator=train_gen.get_data(),
+        steps_per_epoch=int(train_gen.num_examples / train_gen.batch_size),
         epochs=5,
-        validation_data=test.get_data(),
-        validation_steps=int(test.num_examples / test.batch_size),
+        validation_data=test_gen.get_data(),
+        validation_steps=int(train_gen.num_examples / train_gen.batch_size),
         callbacks=[cb]
     )
     
